@@ -1,0 +1,143 @@
+### get example, url format => http://baseURL/namaIndex/_doc/idRecord
+GET http://localhost:9200/parents/_doc/1
+
+### get example source only, url format => http://baseURL/namaIndex/_source/idRecord
+GET http://localhost:9200/parents/_source/1
+
+### multi get, url format => http://baseURL/namaIndex/_mget
+POST  http://localhost:9200/parents/_mget
+Content-Type: application/json
+
+{
+    "ids": [1, 2]
+}
+
+### multi get + multi index, url format => http://baseURL/_mget
+POST  http://localhost:9200/_mget
+Content-Type: application/json
+
+{
+    "docs": [
+        {
+            "_id": 1,
+            "_index": "parents"
+        },
+        {
+            "_id": "username1",
+            "_index": "customer"
+        }
+    ]
+}
+
+### check exist record, url format => http://baseURL/namaIndex/_doc/idRecord
+HEAD http://localhost:9200/customer/_doc/username1001
+
+### create example, url format => http://baseURL/namaIndex/_create/idRecord
+POST http://localhost:9200/customer/_create/lamak
+Content-Type: application/json
+
+{
+    "name": "M Kamaludien A",
+    "register_at": "2023-12-22 00:00:00"
+}
+
+### create new / replace example (bisa method PUT juga), url format => http://baseURL/namaIndex/_doc/idRecord
+POST http://localhost:9200/customer/_doc/username1001
+Content-Type: application/json
+
+{
+    "first_name": "M",
+    "last_name": "Kamaludien"
+}
+
+### update product, url format => http://baseURL/namaIndex/_update/idRecord
+POST http://localhost:9200/customer/_update/username1001
+Content-Type: application/json
+
+{
+    "doc": {
+        "fisrt_name": "Muh."
+    }
+}
+
+### delete product, url format => http://baseURL/namaIndex/_doc/idRecord
+DELETE http://localhost:9200/customer/_doc/username1001
+
+### bulk documents, url format => http://baseURL/_bulk
+POST http://localhost:9200/_bulk
+Content-Type: application/json
+
+< categories.json
+
+
+### update value customer username 1 (flattened field)
+POST http://localhost:9200/customer/_update/username1
+Content-Type: application/json
+
+{
+    "doc": {
+        "labels": {
+            "prority": "vip",
+            "discount": "10% discount",
+            "complaint": "always complaint"
+        }
+    }
+}
+
+### update value customer username 10 (flattened field)
+POST http://localhost:9200/customer/_update/username10
+Content-Type: application/json
+
+{
+    "doc": {
+        "labels": {
+            "prority": "regular",
+            "verified": "unverivied",
+            "buy": "never buy"
+        }
+    }
+}
+
+### 
+POST http://localhost:9200/parents/_doc/1
+Content-Type: application/json
+
+{
+    "fullname": "M Kamaludien",
+    "first_name": "M",
+    "last_name": "Kamaludien",
+    "children": [
+        {
+            "first_name": "Nufail",
+            "last_name": "Labib"
+        },
+        {
+            "first_name": "Misyal",
+            "last_name": "Khawarizmi"
+        }
+    ]
+}
+
+### update index document / record ketika ada perubahan mapping (biasanya ketika update multi field)
+# url format => http://baseURL/namaIndex/_update_by_query
+POST http://localhost:9200/categories/_update_by_query
+Content-Type: application/json
+
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+### delete index document / record by query
+# url format => http://baseURL/namaIndex/_delete_by_query
+POST http://localhost:9200/parents/_delete_by_query
+Content-Type: application/json
+
+{
+    "query": {
+        "match": {
+            "fullname": "kamaludien"
+        }
+    }
+}

@@ -1,0 +1,48 @@
+### create repo
+PUT http://localhost:9200/_snapshot/first_backup
+Content-Type: application/json
+
+{
+    "type": "fs",
+    "settings": {
+        "location": "first_backup"
+    }
+}
+
+### list repo
+GET http://localhost:9200/_snapshot
+
+
+### create snapshot
+PUT http://localhost:9200/_snapshot/first_backup/snap1
+Content-Type: application/json
+
+{
+    "indices": [],
+    "metadata": {
+        "taken_by": "kamal",
+        "taken_because": "backup before upgrade elastic version"
+    }
+}
+
+### get snapshot
+GET  http://localhost:9200/_snapshot/first_backup/snap1
+
+### restore index
+# notes:
+# sebelum dijalankan make sure index diclose
+# jikan ingin restore semua index => "indices": []
+POST http://localhost:9200/_snapshot/first_backup/snap1/_restore
+Content-Type: application/json
+
+{
+    "indices": [
+        "categories"
+    ]
+}
+
+### delete snapshot
+DELETE http://localhost:9200/_snapshot/first_backup/snap1
+
+### delete repository
+DELETE http://localhost:9200/_snapshot/first_backup

@@ -1,0 +1,8 @@
+### cat API
+GET http://localhost:9200/_cat
+
+### cat API health info (tambahkan ?v untuk judul kolom)
+GET http://localhost:9200/_cat/health?v
+
+### cat API all index info
+GET http://localhost:9200/_cat/indices?v

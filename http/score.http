@@ -1,0 +1,58 @@
+### check detail score username123
+POST http://localhost:9200/customer/_explain/username126
+Content-Type: application/json
+
+{
+    "query": {
+        "bool": {
+            "must": {
+                "term": {
+                    "hobbies": "gaming"
+                }
+            },
+            "should": [
+                {
+                    "term": {
+                        "banks.name": "bca"
+                    }
+                },
+                {
+                    "term": {
+                        "banks.name": "bni"
+                    }
+                }
+            ],
+            "minimum_should_match": 2
+        }
+    }
+}
+
+
+### score boost (untuk menaikkan dan menurunkan score dari score aslinya, default value = 1)
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "bool": {
+            "should": [
+                {
+                    "term": {
+                        "banks.name": {
+                            "value": "mandiri",
+                             "boost": 0
+                        }
+                    }
+                },
+                {
+                    "term": {
+                        "banks.name": {
+                            "value": "bni",
+                            "boost": 2
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

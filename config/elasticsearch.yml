@@ -18,6 +18,8 @@ http.port: 9200
 path.data: data
 path.logs: logs
 
+#lokasi repositori untuk backup data
+path.repo: backup
 
 # ---------------------------------- Cluster -----------------------------------
 #

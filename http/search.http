@@ -1,69 +1,19 @@
-### ---GET---
-### show all index
-GET http://localhost:9200/_cat/indices?v
+### search customers, url format => http://baseURL/namaIndex/_search
+GET http://localhost:9200/categories/_search
 
-### get customers
-GET http://localhost:9200/customers/_doc/lamak
+### search products pagination, url format => http://baseURL/namaIndex/_search?size={totalDataPerPage}&from={startData}
+GET http://localhost:9200/customer/_search?size=1&from=0
 
-### get customers dengan _source
-GET http://localhost:9200/customers/_source/lamak
+### search products sort by field, url format => http://baseURL/namaIndex/_search?sort={nameField:sortMethod}
+# notes:
+# tipe data text tidak bisa di sort, jadi harus diubah dulu ke tipe data keyword
+GET http://localhost:9200/customer/_search?sort=email:asc
 
-### check exist customers
-HEAD http://localhost:9200/customers/_doc/lamak
+### search field includes, url format => http://baseURL/namaIndex/_search?_source_includes={fields}
+GET http://localhost:9200/customer/_search?_source_includes=first_name,last_name
 
-### get products
-GET http://localhost:9200/products/_doc/1
-
-### get orders
-GET http://localhost:9200/orders/_doc/1
-
-### multi get
-POST  http://localhost:9200/products/_mget
-Content-Type: application/json
-
-{
-    "ids": [1, 2]
-}
-
-### multi get + multi index
-POST  http://localhost:9200/_mget
-Content-Type: application/json
-
-{
-    "docs": [
-        {
-            "_id": 1,
-            "_index": "orders"
-        },
-        {
-            "_id": "lamak",
-            "_index": "customers"
-        }
-    ]
-}
-
-### SEARCH
-
-### search customers
-POST http://localhost:9200/customer/_search
-
-### search products page 1
-POST http://localhost:9200/products/_search?size=1&from=0
-
-### search products page 2
-POST http://localhost:9200/products/_search?size=1&from=1
-
-### search products sort by price
-POST http://localhost:9200/products/_search?sort=price:asc
-
-### search products sort by name (masih error karena tipe data text harus diganti ke tipedata keyword)
-POST http://localhost:9200/products/_search?sort=name:asc
-
-### search with include
-POST http://localhost:9200/order/_search?_source_includes=total
-
-### search with exxclude
-POST http://localhost:9200/order/_search?_source_excludes=total
+### search field exclude, url format => http://baseURL/namaIndex/_search?_source_excludes={fields}
+GET http://localhost:9200/customer/_search?_source_excludes=hobbies,banks,address
 
 ### search customers with query and filter body
 POST http://localhost:9200/customer/_search
@@ -84,7 +34,9 @@ Content-Type: application/json
     ]
 }
 
-### search customers where gender = 'Female' (term query untuk tipe data keyword)
+### search with filter term (term query untuk tipe data keyword)
+# notes:
+# term query ini case sensitive
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -96,19 +48,23 @@ Content-Type: application/json
     }
 }
 
-### search customers where banks.name = 'BCA'
+### search with filter match
+# notes:
+# di match query semua value auto lowercase
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
 {
     "query" : {
         "match": {
-            "banks.name": "bca"
+            "banks.name": "BCa"
         }
     }
 }
 
-### search customers where banks.name = 'BCA digital'
+### search with filter match + operator
+# notes: 
+# default value operator = "or"
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -123,7 +79,7 @@ Content-Type: application/json
     }
 }
 
-### search customers where username: username1, username2, username3
+### search filter where in
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -139,7 +95,13 @@ Content-Type: application/json
     }
 }
 
-### search customers where hobbies = gamming AND banks.name = bca digital
+### search with boolean query (must, should, must_not, filter)
+# notes: 
+# pada boolean query filter dan must kurleb sama, bedanya must melibatkan score
+# pada boolean query should ada param minimum_should_match dengan default value = 1
+# pada boolean query should jika ada query must / filter, minimum_should_match default value = 0
+
+### must
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -165,7 +127,7 @@ Content-Type: application/json
     }
 }
 
-### search customers where hobbies != gamming AND banks.name != bca digital
+### must_not
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -191,7 +153,7 @@ Content-Type: application/json
     }
 }
 
-### search customers where banks.name = mandiri OR banks.name = bca digital
+### should
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -217,7 +179,7 @@ Content-Type: application/json
     }
 }
 
-### search customers where hobbies = gamming AND banks.name = bca digital with manual sort
+### filter (karena tidak melibatkan score, jadi perlu manual sort untuk mendefinisikan urutan datanya)
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -250,8 +212,7 @@ Content-Type: application/json
     ]
 }
 
-### search customers where hobbies = gaming AND (banks.name = mandiri OR banks.name = bca digital)
-# default value ketika ada query selain should minimum_should_match = 0, jadi harus di set valuenya
+### contoh multi bool query
 POST http://localhost:9200/customer/_search
 Content-Type: application/json
 
@@ -283,4 +244,91 @@ Content-Type: application/json
             "minimum_should_match": 1
         }   
     }
+}
+
+### search customers by flattened field (labels)
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "term": {
+            "labels": "regular"
+        }
+    }
+}
+
+###
+# note: 
+# value dari flattened field, tipe datanya adalah keyword
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "term": {
+            "labels.prority": "regular"
+        }
+    }
+}
+
+### nested query
+# notes:
+# nested query adalah cara terakhir jika tidak ada solusi lain, karena ini memperlambat performa
+POST  http://localhost:9200/parents/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "nested": {
+            "path": "children",
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match": {
+                                "children.first_name": "Misyal"
+                            }
+                        },
+                        {
+                            "match": {
+                                "children.last_name": "Khawarizmi"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
+
+### sort by multi field
+POST  http://localhost:9200/parents/_search
+Content-Type: application/json
+
+{
+    "sort": [
+        {
+            "fullname.fn_keyword": "asc"
+        }
+    ]
+}
+
+### deep search pagination menggunakan search_after (valuenya ambil dari sort value terakhir)
+POST http://localhost:9200/categories/_search
+Content-Type: application/json
+
+{
+    "size": 10,
+    "from": 0,
+    "sort": [
+        {
+            "id": {
+                "order": "asc"
+            }
+        }
+    ],
+    "search_after": [
+        "19940"
+    ]
 }

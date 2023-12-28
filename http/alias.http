@@ -1,3 +1,6 @@
+### show aliases
+GET  http://localhost:9200/_aliases
+
 ### create alias
 POST http://localhost:9200/_aliases
 Content-Type: application/json
@@ -7,13 +10,7 @@ Content-Type: application/json
         {
             "add": {
                 "alias": "customer",
-                "index": "customers"
-            }
-        },
-        {
-            "add": {
-                "alias": "order",
-                "index": "orders"
+                "index": "customers_v2"
             }
         }
     ]
@@ -39,9 +36,3 @@ Content-Type: application/json
         }
     ]
 }
-
-### show aliases
-GET  http://localhost:9200/_aliases
-
-### search with alias
-GET http://localhost:9200/order/_search

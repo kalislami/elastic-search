@@ -1,0 +1,24 @@
+### show all index
+GET http://localhost:9200/_cat/indices?v
+
+### create index, url format => http://baseURL/namaIndex
+PUT http://localhost:9200/categories
+
+### delete index, url format => http://baseURL/namaIndex
+DELETE  http://localhost:9200/categories
+
+### delete all index document / record, url format => http://baseURL/namaIndex/_delete_by_query
+POST http://localhost:9200/categories/_delete_by_query
+Content-Type: application/json
+
+{
+    "query": {
+        "match_all": {}
+    }
+}
+
+### close index (service crud index di close), url format => http://baseURL/namaIndex/_close
+POST http://localhost:9200/categories/_close
+
+### open index (service crud index di open), url format => http://baseURL/namaIndex/_open
+POST http://localhost:9200/categories/_open
