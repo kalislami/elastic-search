@@ -1,0 +1,27 @@
+### check detail score
+POST http://localhost:9200/customer/_explain/username126
+
+{
+    "query": {
+        "bool": {
+            "must": {
+                "term": {
+                    "hobbies": "gaming"
+                }
+            },
+            "should": [
+                {
+                    "term": {
+                        "banks.name": "bca"
+                    }
+                },
+                {
+                    "term": {
+                        "banks.name": "bni"
+                    }
+                }
+            ],
+            "minimum_should_match": 2
+        }
+    }
+}

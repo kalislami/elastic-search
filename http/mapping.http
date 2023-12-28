@@ -1,0 +1,145 @@
+### get mapping customers
+GET http://localhost:9200/customers/_mapping
+
+### get mapping customers v2
+GET http://localhost:9200/customers_v2/_mapping
+
+### get mapping products
+GET http://localhost:9200/products/_mapping
+
+### get mapping orders
+GET http://localhost:9200/orders/_mapping
+
+### update customers mapping
+PUT http://localhost:9200/customers/_mapping
+Content-Type: application/json
+
+{
+    "date_detection": true,
+    "dynamic_date_formats": [
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy/MM/dd"
+    ],
+    "numeric_detection": true
+}
+
+### update products mapping
+PUT http://localhost:9200/products/_mapping
+Content-Type: application/json
+
+{
+    "date_detection": true,
+    "dynamic_date_formats": [
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy/MM/dd"
+    ],
+    "numeric_detection": true
+}
+
+### update orders mapping
+PUT http://localhost:9200/orders/_mapping
+Content-Type: application/json
+
+{
+    "date_detection": true,
+    "dynamic_date_formats": [
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy/MM/dd"
+    ],
+    "numeric_detection": true
+}
+
+### create index customer_v2
+PUT  http://localhost:9200/customers_v2
+
+### props mapping
+PUT http://localhost:9200/customers_v2/_mapping
+Content-Type: application/json
+
+{
+    "date_detection": true,
+    "dynamic_date_formats": [
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy/MM/dd"
+    ],
+    "numeric_detection": true,
+    "properties": {
+        "username": {
+            "type": "keyword"
+        },
+        "first_name": {
+            "type": "text"
+        },
+        "last_name": {
+            "type": "text"
+        },
+        "email": {
+            "type": "keyword"
+        },
+        "gender": {
+            "type": "keyword"
+        },
+        "birth_date": {
+            "type": "date",
+            "format": "yyyy-MM-dd"
+        }
+    }
+}
+
+### update mapping
+PUT http://localhost:9200/customers_v2/_mapping
+Content-Type: application/json
+
+{
+    "properties": {
+        "address": {
+            "properties": {
+                "street": {
+                    "type": "text"
+                },
+                "city": {
+                    "type": "text"
+                },
+                "province": {
+                    "type": "text"
+                },
+                "country": {
+                    "type": "text"
+                },
+                "zip_code": {
+                    "type": "keyword"
+                }
+            }
+        }
+    }
+}
+
+### update mapping (array / array of object mapping)
+PUT http://localhost:9200/customers_v2/_mapping
+Content-Type: application/json
+
+{
+    "properties": {
+        "hobbies": {
+            "type": "text"
+        },
+        "banks": {
+            "properties": {
+                "name" : {
+                    "type": "text"
+                },
+                "account_number" : {
+                    "type": "keyword"
+                }
+            } 
+        }
+    }
+}

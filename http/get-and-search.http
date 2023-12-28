@@ -1,0 +1,286 @@
+### ---GET---
+### show all index
+GET http://localhost:9200/_cat/indices?v
+
+### get customers
+GET http://localhost:9200/customers/_doc/lamak
+
+### get customers dengan _source
+GET http://localhost:9200/customers/_source/lamak
+
+### check exist customers
+HEAD http://localhost:9200/customers/_doc/lamak
+
+### get products
+GET http://localhost:9200/products/_doc/1
+
+### get orders
+GET http://localhost:9200/orders/_doc/1
+
+### multi get
+POST  http://localhost:9200/products/_mget
+Content-Type: application/json
+
+{
+    "ids": [1, 2]
+}
+
+### multi get + multi index
+POST  http://localhost:9200/_mget
+Content-Type: application/json
+
+{
+    "docs": [
+        {
+            "_id": 1,
+            "_index": "orders"
+        },
+        {
+            "_id": "lamak",
+            "_index": "customers"
+        }
+    ]
+}
+
+### SEARCH
+
+### search customers
+POST http://localhost:9200/customer/_search
+
+### search products page 1
+POST http://localhost:9200/products/_search?size=1&from=0
+
+### search products page 2
+POST http://localhost:9200/products/_search?size=1&from=1
+
+### search products sort by price
+POST http://localhost:9200/products/_search?sort=price:asc
+
+### search products sort by name (masih error karena tipe data text harus diganti ke tipedata keyword)
+POST http://localhost:9200/products/_search?sort=name:asc
+
+### search with include
+POST http://localhost:9200/order/_search?_source_includes=total
+
+### search with exxclude
+POST http://localhost:9200/order/_search?_source_excludes=total
+
+### search customers with query and filter body
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "match_all": {}
+    },
+    "size": 5,
+    "from": 0,
+    "sort": [
+        {
+            "username": {
+                "order": "asc"
+            }
+        }
+    ]
+}
+
+### search customers where gender = 'Female' (term query untuk tipe data keyword)
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "term": {
+            "gender": "Female"
+        }
+    }
+}
+
+### search customers where banks.name = 'BCA'
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "match": {
+            "banks.name": "bca"
+        }
+    }
+}
+
+### search customers where banks.name = 'BCA digital'
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "match": {
+            "banks.name": {
+                "query": "bca digital",
+                "operator": "and"
+            }
+        }
+    }
+}
+
+### search customers where username: username1, username2, username3
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "terms": {
+            "username": [
+                "username1",
+                "username2",
+                "username3"
+            ]
+        }
+    }
+}
+
+### search customers where hobbies = gamming AND banks.name = bca digital
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "bool" : {
+            "must": [
+                {
+                    "term": {
+                        "hobbies": "gaming"
+                    }
+                },
+                {
+                    "match": {
+                        "banks.name": {
+                            "query": "bca digital",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ]
+        }   
+    }
+}
+
+### search customers where hobbies != gamming AND banks.name != bca digital
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "bool" : {
+            "must_not": [
+                {
+                    "term": {
+                        "hobbies": "gaming"
+                    }
+                },
+                {
+                    "match": {
+                        "banks.name": {
+                            "query": "bca digital",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ]
+        }   
+    }
+}
+
+### search customers where banks.name = mandiri OR banks.name = bca digital
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "bool" : {
+            "should": [
+                {
+                    "term": {
+                        "banks.name": "mandiri"
+                    }
+                },
+                {
+                    "match": {
+                        "banks.name": {
+                            "query": "bca digital",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ]
+        }   
+    }
+}
+
+### search customers where hobbies = gamming AND banks.name = bca digital with manual sort
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "bool" : {
+            "filter": [
+                {
+                    "term": {
+                        "hobbies": "gaming"
+                    }
+                },
+                {
+                    "match": {
+                        "banks.name": {
+                            "query": "bca digital",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ]
+        }  
+    },
+    "sort": [
+        {
+            "username": {
+                "order": "desc"
+            }
+        }
+    ]
+}
+
+### search customers where hobbies = gaming AND (banks.name = mandiri OR banks.name = bca digital)
+# default value ketika ada query selain should minimum_should_match = 0, jadi harus di set valuenya
+POST http://localhost:9200/customer/_search
+Content-Type: application/json
+
+{
+    "query" : {
+        "bool" : {
+            "must": [
+                {
+                    "term": {
+                        "hobbies": "gaming"
+                    }
+                }
+            ],
+            "should": [
+                {
+                    "term": {
+                        "banks.name": "mandiri"
+                    }
+                },
+                {
+                    "match": {
+                        "banks.name": {
+                            "query": "bca digital",
+                            "operator": "and"
+                        }
+                    }
+                }
+            ],
+            "minimum_should_match": 1
+        }   
+    }
+}

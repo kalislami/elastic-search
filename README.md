@@ -1,2 +1,5 @@
 # elastic-search
-search engine database
+### search engine database
+#
+## run elasticsearch command:
+### ./bin/elasticsearch

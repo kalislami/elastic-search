@@ -1,0 +1,9 @@
+{"create" : {"_index": "customers", "_id": "misyal"}}
+{"name": "Misyal Khawarizmi", "register_at": "2023-12-22 00:00:00"}
+{"index" : {"_index": "customers", "_id": "cahya"}}
+{"name": "Cahya Ika R", "register_at": "2023-12-22 00:00:00"}
+{"update" : {"_index": "products", "_id": "1"}}
+{ "doc": { "price": 3000000 }}
+{"create" : {"_index": "customers", "_id": "sample"}}
+{"name": "Sample Cust", "register_at": "2023-12-22 00:00:00"}
+{"delete" : {"_index": "customers", "_id": "sample"}}
